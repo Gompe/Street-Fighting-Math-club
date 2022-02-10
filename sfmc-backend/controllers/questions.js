@@ -8,17 +8,27 @@ const {updateContest} = require('./contests')
 
 const createQuestion = async(req, res) => {
 
+    console.log("Create Question Request")
+    console.log(req.body)
+
     const contestId = req.body.contestId
+
     if(!contestId){
         throw new BadRequestError("You need to specify a contest")
     }
+
+    console.log("contestId exists")
 
     const contest = Contest.findOne({_id:contestId})
     if(!contest){
         throw new BadRequestError("Contest not found")
     }
 
+    console.log("contest found")
+
     const question = await Question.create(req.body)
+    console.log("question created")
+    
     res.status(StatusCodes.CREATED).json({ question })
 }
 

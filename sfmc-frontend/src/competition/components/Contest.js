@@ -18,7 +18,7 @@ const Contest = () => {
         </div>
         <section className='contest'>
             {questions.map((question) => {
-                return <Question key={question.id} {...question}/>
+                return <Question key={question.questionId} {...question}/>
             })}
         </section>
     </>

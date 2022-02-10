@@ -7,6 +7,7 @@ import Home from './Home'
 import Contest from './competition/components/Contest'
 import ErrorPage from './error/ErrorPage';
 import {Login, Register} from './auth'
+import QuestionForm from './forms/createQuestion';
 
 function App() {
   return <Router>
@@ -17,6 +18,8 @@ function App() {
       <Route path='/register' element={<Register/>}></Route>
 
       <Route path='/contest/:contestId' element={ <Contest/> }></Route>
+      <Route path='/questions/create/:contestId' element={ <> <QuestionForm/> <Contest/> </> }></Route>
+
       <Route path='*' element={<ErrorPage/>}></Route>
     </Routes>
   </Router>
