@@ -1,81 +1,92 @@
 const { StatusCodes } = require('http-status-codes')
 const { BadRequestError, NotFoundError } = require('../errors')
 
-const Contest = require('../models/Contest')
-const Question = require('../models/Question')
+const { Contest, Question } = require('../models')
 
-const getAllContests = async(req, res) => {
-    
-    const contests = await Contest.find()
-    res.status(StatusCodes.OK).json({ contests, count: contests.length })
-
+const getAllContests = async (req, res) => {
+  const contests = await Contest.find().sort({ startingTime: -1 })
+  res.status(StatusCodes.OK).json({ contests, count: contests.length })
 }
 
-const getContest = async(req, res) => {
+const getContest = async (req, res) => {
+  const { contestId } = req.params
+  const contest = await Contest.findById(contestId)
 
-    console.log("Request Received")
+  if (!contest) {
+    console.log('Contest with id: ', contestId, ' not found')
+    throw new NotFoundError(`No contest with id ${contestId}`)
+  }
 
-    const { params: {id: contestId} } = req 
-
-    const contest = await Contest.findOne({
-        _id: contestId,
-    })
-
-    if (!contest) {
-        throw new NotFoundError(`No contest with id ${contestId}`)
-    }
-
-    const questions = await Question.find({contest : contestId})
-
-    res.status(StatusCodes.OK).json({ contest, questions })
+  console.log('Respoonse: ', contest)
+  res.status(StatusCodes.OK).json({ contest })
 }
 
-const createContest = async(req, res) => {
-
-    const contest = await Contest.create(req.body)
-    res.status(StatusCodes.CREATED).json({ contest })
+const createContest = async (req, res) => {
+  const contest = await Contest.create(req.body)
+  res.status(StatusCodes.CREATED).json({ contest })
 }
 
-const deleteContest = async(req, res) => {
-    const { params: {id: contestId} } = req 
+const deleteContest = async (req, res) => {
+  const { contestId } = req.params
 
-    const contest = await Contest.findOneAndRemove({
-        _id: contestId,
-    })
+  const contest = await Contest.findByIdAndRemove(contestId)
 
-    if (!contest) {
-        throw new NotFoundError(`No contest with id ${contestId}`)
-    }
+  if (!contest) {
+    throw new NotFoundError(`No contest with id ${contestId}`)
+  }
 
-    res.status(StatusCodes.OK).send("Contest Deleted")
+  res.status(StatusCodes.OK).json({ success: true })
 }
 
-const updateContest = async(req, res) => {
+const updateContest = async (req, res) => {
+  const { contestId } = req.params
 
-    const { user: {userId}, params: {id: contestId} } = req 
-    const { body: {description} } = req
+  const contest = await Contest.findByIdAndUpdate(contestId, req.body, {
+    new: true,
+    runValidators: true,
+  })
 
-    if (!description) {
-        throw new BadRequestError('Company or Position fileds cannot be empty')
+  if (!contest) {
+    throw new NotFoundError(`No contest with id ${contestId}`)
+  }
+
+  res.status(StatusCodes.OK).json(contest)
+}
+
+// --- Functions for contest view
+
+const groupQuestions = async (req, res) => {
+  const questions = await Question.find({ contestId: req.contest._id })
+  req.questions = questions.map((question) => {
+    return {
+      _id: question._id,
+      description: question.description,
+      index: question.index,
     }
+  })
+}
 
-    const contest = await Contest.findByIdAndUpdate(
-        { _id: contestId },
-        req.body,
-        { new: true, runValidators: true }
-    )
+const ContestView = async (req, res) => {
+  // Checks
+  // console.log('Contest View Checks')
 
-    if (!contest) {
-        throw new NotFoundError(`No contest with id ${contestId}`)
-    }
+  await groupQuestions(req, res)
+  // console.log('Check Group Questions OK')
 
-    res.status(StatusCodes.OK).json({ contest })
+  const attempts = req.contest.maxAttempts - req.participation.answers.length
+
+  res.status(StatusCodes.OK).json({
+    questions: req.questions,
+    contest: req.contest,
+    attempts,
+  })
 }
 
 module.exports = {
-    getAllContests,
-    getContest,
-    createContest,
-    deleteContest,
-    updateContest,
+  getAllContests,
+  getContest,
+  createContest,
+  deleteContest,
+  updateContest,
+  ContestView,
 }
