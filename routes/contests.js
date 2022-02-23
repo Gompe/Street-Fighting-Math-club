@@ -16,8 +16,7 @@ const authentication = require('../middleware/authentication')
 router.route('/').get(getAllContests)
 router.route('/').get(ContestView)
 
-router.use(authentication)
-router.use(adminAuth)
+router.use(authentication, adminAuth)
 
 router.post('/', createContest)
 
