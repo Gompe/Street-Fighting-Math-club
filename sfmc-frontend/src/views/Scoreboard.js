@@ -94,7 +94,6 @@ const ScoreboardBody = ({ userRows, numQuestions }) => {
 
 const ScoreboardUser = ({ userRow, numQuestions }) => {
   const { userId, userName, answers, points } = userRow
-  console.log(userRow)
 
   const [isLoading, setIsLoading] = useState(true)
   const [grades, setGrades] = useState(Array(numQuestions).fill(-1))

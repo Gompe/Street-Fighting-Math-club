@@ -21,10 +21,7 @@ const ContestCardAdmin = (contest) => {
                 </Link>
               </div>
               <div className='col-3'>
-                <ContestDelete
-                  className='float-right'
-                  contestId={contest._id}
-                />
+                <ContestDelete contestId={contest._id} />
               </div>
             </div>
           </div>
