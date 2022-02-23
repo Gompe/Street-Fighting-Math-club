@@ -13,7 +13,6 @@ export const useFetch = (url) => {
   }
 
   useEffect(() => {
-    console.log('Use effect being called')
     getData()
   }, [url])
 

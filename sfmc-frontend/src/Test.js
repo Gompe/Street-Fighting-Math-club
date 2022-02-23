@@ -13,7 +13,6 @@ const Test = () => {
     a.forEach(async (x) => {
       // console.time('async loop ' + x)
       await sleep(5000)
-      console.log('Loop ' + x + ' done')
     })
 
     console.timeEnd('queryTime')

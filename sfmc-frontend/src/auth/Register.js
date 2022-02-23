@@ -18,10 +18,6 @@ const Register = () => {
       method: 'POST',
       body: { ...user },
     })
-
-    response.then((data) => {
-      console.log(data)
-    })
   }
 
   const handleSubmit = (e) => {
