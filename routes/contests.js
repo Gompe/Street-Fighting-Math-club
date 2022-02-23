@@ -11,10 +11,12 @@ const {
 } = require('../controllers/contests')
 
 const adminAuth = require('../middleware/adminAuth')
+const authentication = require('../middleware/authentication')
 
 router.route('/').get(getAllContests)
 router.route('/').get(ContestView)
 
+router.use(authentication)
 router.use(adminAuth)
 
 router.post('/', createContest)
